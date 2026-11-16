@@ -1,0 +1,24 @@
+Copyright (c) 2026 21HoKim. All rights reserved.
+
+This license covers "YouTube Music Player for VS Code", the extension published on the Visual Studio
+Marketplace under the publisher "21HoKim" (the "Software").
+
+You may install and use the Software, free of charge.
+
+Without prior written permission from the copyright holder, you may not:
+  - copy, modify, merge, publish, distribute, sublicense or sell the Software or any part of it;
+  - reverse engineer, decompile or disassemble the Software, except to the extent that applicable law
+    expressly permits it;
+  - use the Software's code, or any part of it, in other software.
+
+Third-party components included in the Software are licensed under their own terms; see
+THIRD_PARTY_NOTICES.txt.
+
+YouTube and YouTube Music are trademarks of Google LLC. The Software is an independent project and is
+not affiliated with, endorsed or sponsored by Google LLC or YouTube.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
