@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 — 첫 정식 버전
+
+- YouTube Music Player for VS Code의 첫 정식 버전이에요. 0.14.1과 기능은 같아요.
+
 ## 0.14.1 — 공개 저장소
 
 - **소개 그림이 보여요**: README의 그림이 VS Code 확장 페이지와 마켓에서 보이도록, 코드 없이 소개·그림·이슈만 두는 공개 저장소를 연결했어요: https://github.com/21HoKim/youtube-music-player-vscode
