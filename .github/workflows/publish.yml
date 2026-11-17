@@ -1,0 +1,84 @@
+# Publishes the VSIX attached to a release of this repository to the VS Code Marketplace and Open VSX.
+#
+# Publish a release (tag v<version>) with youtube-music-player-vscode-<version>.vsix attached: this
+# workflow downloads that file, checks it is the version of the tag, and uploads the same file to both
+# stores. Nothing is built here (the source code is private). To retry a release, run it by hand
+# (Actions → Publish → Run workflow) with its tag.
+#
+# Sign-in is Trusted Publishing (OIDC): no token is stored in this repository. Both stores trust this
+# workflow file of this repository (repository owner 21HoKim, repository youtube-music-player-vscode,
+# workflow publish.yml):
+#   - VS Code Marketplace: marketplace.visualstudio.com/manage → publisher 21HoKim → Trusted Publishing.
+#   - Open VSX: open-vsx.org/user-settings/trusted-publishers (namespace 21HoKim).
+# Open VSX can use an access token instead: an Actions secret OVSX_PAT, if set, is used.
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (e.g. v1.0.2)
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Download the release's VSIX
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          FILE="youtube-music-player-vscode-${VERSION}.vsix"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$FILE" --dir dist
+          test -s "dist/$FILE" || { echo "::error::$FILE is not attached to release $TAG"; exit 1; }
+          echo "VSIX=dist/$FILE" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Check it is this extension at the tag's version
+        run: |
+          set -euo pipefail
+          unzip -p "$VSIX" extension/package.json > manifest.json
+          node -e '
+            const m = require("./manifest.json");
+            const want = { publisher: "21HoKim", name: "youtube-music-player-vscode", version: process.env.VERSION };
+            const got = { publisher: m.publisher, name: m.name, version: m.version };
+            if (JSON.stringify(got) !== JSON.stringify(want)) {
+              console.log(`::error::the VSIX is ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`);
+              process.exit(1);
+            }
+            console.log(`${m.publisher}.${m.name} ${m.version}`);
+          '
+
+      - name: Publish to the VS Code Marketplace
+        run: npx --yes @vscode/vsce@4 publish --oidc --packagePath "$VSIX" --skip-duplicate
+
+      - name: Publish to Open VSX
+        if: ${{ !cancelled() }}
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          set -euo pipefail
+          if [ -n "${OVSX_PAT:-}" ]; then
+            npx --yes ovsx@1 publish "$VSIX" --skip-duplicate
+          else
+            unset OVSX_PAT
+            npx --yes ovsx@1 publish "$VSIX" --skip-duplicate --trusted-publishing
+          fi
